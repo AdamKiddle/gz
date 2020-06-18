@@ -88,7 +88,8 @@ struct movie_input
 {
   z64_controller_t      raw;            /* 0x0000 */
   uint16_t              pad_delta;      /* 0x0004 */
-                                        /* 0x0006 */
+  uint16_t 				equipment;   	/* 0x0006 */
+  uint8_t				button_items[4];/* 0x0008 */ 
 };
 
 struct movie_seed
@@ -130,6 +131,7 @@ struct gz
   struct menu          *menu_global;
   struct menu          *menu_main;
   struct menu          *menu_explorer;
+  struct menu          *menu_watches;
   struct menu          *menu_mem;
   struct menu_item     *menu_watchlist;
   _Bool                 menu_active;

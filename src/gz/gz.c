@@ -571,6 +571,12 @@ HOOK void input_hook(void)
           vector_reserve(&gz.movie_input, 128);
         vector_push_back(&gz.movie_input, 1, NULL);
       }
+	  // GnS Custom code to save equips to macro 
+	  struct movie_input *mi = vector_at(&gz.movie_input, gz.movie_frame);
+	  mi->equipment = z64_file.equips;
+	  for (int i = 0; i < 4; ++i)
+		mi->button_items[i] = z64_file.button_items[i];
+	  // Custom code ends
       z_to_movie(gz.movie_frame++, &zi[0], gz.reset_flag);
     }
     else if (gz.movie_state == MOVIE_PLAYING) {
@@ -582,6 +588,18 @@ HOOK void input_hook(void)
       }
       if (gz.movie_state == MOVIE_PLAYING) {
         _Bool reset;
+		// GnS Custom Custom code to load equips from macro
+		struct movie_input *mi = vector_at(&gz.movie_input, gz.movie_frame);
+		z64_file.equips = mi->equipment;
+	    for (int i = 0; i < 4; ++i){
+		  z64_file.button_items[i] = mi->button_items[i];
+          if (z64_file.button_items[i] != Z64_ITEM_NULL)
+            z64_UpdateItemButton(&z64_game, i);
+		  else if (i == Z64_ITEMBTN_B)
+			z64_file.inf_table[29] |= 0x0001;
+		}
+		z64_UpdateEquipment(&z64_game, &z64_link);
+		// Custom code ends
         movie_to_z(gz.movie_frame++, &zi[0], &reset);
         if (settings->bits.macro_input) {
           gz.reset_flag |= reset;
@@ -1088,6 +1106,7 @@ static void init(void)
     menu_init(&global, MENU_NOVALUE, MENU_NOVALUE, MENU_NOVALUE);
     gz.menu_main = &menu;
     gz.menu_global = &global;
+    gz.menu_watches = &watches;
 
     /* populate top menu */
     menu.selector = menu_add_button(&menu, 0, 0, "return",
