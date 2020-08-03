@@ -360,6 +360,9 @@ static void main_hook(void)
     menu_draw(gz.menu_main);
   menu_draw(gz.menu_global);
 
+  /* execute angle finder */
+  gz_angle_finder();
+
   /* execute and draw collision view */
   gz_col_view();
   gz_hit_view();

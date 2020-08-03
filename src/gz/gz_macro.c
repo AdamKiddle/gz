@@ -602,6 +602,62 @@ static int wiivc_cam_proc(struct menu_item *item,
   return 0;
 }
 
+static int angle_desired_proc(struct menu_item *item,
+                             enum menu_callback_reason reason,
+                             void *data)
+{
+  if (reason == MENU_CALLBACK_CHANGED) {
+    gz.angle_desired = menu_intinput_get(item);
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_gets(item) != gz.angle_desired)
+      menu_intinput_set(item, gz.angle_desired);
+  }
+  return 0;
+}
+
+static int angle_best_matching_proc(struct menu_item *item,
+                             enum menu_callback_reason reason,
+                             void *data)
+{
+  if (reason == MENU_CALLBACK_CHANGED) {
+    gz.angle_best_matching = menu_intinput_get(item);
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_gets(item) != gz.angle_best_matching)
+      menu_intinput_set(item, gz.angle_best_matching);
+  }
+  return 0;
+}
+
+static int angle_x_proc(struct menu_item *item,
+                             enum menu_callback_reason reason,
+                             void *data)
+{
+  if (reason == MENU_CALLBACK_CHANGED) {
+    gz.angle_x = menu_intinput_gets(item);
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_gets(item) != gz.angle_x)
+      menu_intinput_set(item, gz.angle_x);
+  }
+  return 0;
+}
+
+static int angle_y_proc(struct menu_item *item,
+                             enum menu_callback_reason reason,
+                             void *data)
+{
+  if (reason == MENU_CALLBACK_CHANGED) {
+    gz.angle_y = menu_intinput_gets(item);
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_gets(item) != gz.angle_y)
+      menu_intinput_set(item, gz.angle_y);
+  }
+  return 0;
+}
+
 static int vcont_enable_proc(struct menu_item *item,
                              enum menu_callback_reason reason,
                              void *data)
@@ -678,12 +734,14 @@ struct menu *gz_macro_menu(void)
 {
   static struct menu menu;
   static struct menu menu_settings;
+  static struct menu menu_tools;
   static struct menu menu_vcont;
   struct menu_item *item;
 
   /* initialize menus */
   menu_init(&menu, MENU_NOVALUE, MENU_NOVALUE, MENU_NOVALUE);
   menu_init(&menu_settings, MENU_NOVALUE, MENU_NOVALUE, MENU_NOVALUE);
+  menu_init(&menu_tools, MENU_NOVALUE, MENU_NOVALUE, MENU_NOVALUE);
   menu_init(&menu_vcont, MENU_NOVALUE, MENU_NOVALUE, MENU_NOVALUE);
 
   /* load textures */
@@ -759,7 +817,7 @@ struct menu *gz_macro_menu(void)
   item->tooltip = "quick play movie";
   /* create settings controls */
   menu_add_submenu(&menu, 0, 15, &menu_settings, "settings");
-    /* create tools controls */
+  /* create tools controls */
   menu_add_submenu(&menu, 0, 16, &menu_tools, "tools");
   /* create virtual controller controls */
   menu_add_submenu(&menu, 0, 17, &menu_vcont, "virtual controller");
@@ -781,16 +839,20 @@ struct menu *gz_macro_menu(void)
   menu_add_static(&menu_settings, 4, 6, "wii vc camera", 0xC0C0C0);
 
   /* populate tools menu */
-  // TODO: menu_tools undefined
   menu_tools.selector = menu_add_submenu(&menu_tools, 0, 0, NULL,
                                             "return");
   menu_add_checkbox(&menu_tools, 0, 1, angle_finder_proc, NULL);
   menu_add_static(&menu_tools, 2, 1, "angle finder", 0xC0C0C0);
-  menu_add_static(&menu_tools, 2, 2, "desired angle", 0xC0C0C0);
-  menu_add_intinput(&menu_tools, 6, 2, 16, 4,
-                  halfword_mod_proc, &gz.desired_angle); // TODO: gz.desired_angle undefined
-  menu_add_static(&menu_tools, 2, 3, "best match", 0xC0C0C0);
-  menu_add_static(&menu_tools, 6, 3, "TODO", 0xC0C0C0); // TODO
+  menu_add_static(&menu_tools, 2, 2, "desired", 0xC0C0C0);
+  menu_add_intinput(&menu_tools, 11, 2, 16, 4,
+                  angle_desired_proc, &gz.angle_desired);
+  menu_add_static(&menu_tools, 2, 3, "closest", 0xC0C0C0);
+  menu_add_intinput(&menu_tools, 11, 3, 16, 4,
+                  angle_best_matching_proc, &gz.angle_best_matching);
+  menu_add_intinput(&menu_tools, 17, 3, -10, 4,
+                  angle_x_proc, &gz.angle_x);
+  menu_add_intinput(&menu_tools, 22, 3, -10, 4,
+                  angle_y_proc, &gz.angle_y);
 
   
     

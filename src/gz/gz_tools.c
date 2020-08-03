@@ -219,121 +219,33 @@ static uint16_t analog_tbl[] = {
 
 
 // converts the values in the lookup table to x and y analog values, and two flags.
-void unpack_analog(uint16_t analog, int16_t* x, int16_t* y, uint16_t* is_accessible_vc, uint16_t* is_fullspeed){
+static void unpack_analog(uint16_t analog, int16_t* x, int16_t* y, uint16_t* is_accessible_vc, uint16_t* is_fullspeed){
 	*x = -(int16_t)((analog & 0xFE00) >> 9);
 	*y =  (int16_t)((analog & 0x01FC) >> 2);
 	*is_accessible_vc = ((analog & 0x0002) >> 1);
 	*is_fullspeed = (analog & 0x0001);
 }
 
-void gz_angle_finder(int16_t* x, int16_t* y, uint16_t* found_angle, uint16_t angle, uint16_t fullspeed){
-    int16_t x;
-    int16_t y;
-    uint16_t found_angle;
-    uint16_t angle;
-    uint16_t fullspeed;
-
-    // TODO: create a system to request an angle and display the results in the tools menu.
-    gz_find_best_analog(&x, &y, &found_angle, angle, fullspeed);
-}
-
-
-void gz_find_best_analog(int16_t* x, int16_t* y, uint16_t* found_angle, uint16_t angle, uint16_t fullspeed){
-	int16_t *x_temp;
-	int16_t *y_temp;
-	uint16_t is_accessible_vc;
-	uint16_t is_fullspeed;
-	uint16_t lookup_angle;
-	
-    angle = angle - z64_camera_angle;
-	if (angle >= 0 && angle < 0x2000)
-	{
-		lookup_angle = angle;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = x_temp;
-		*y = y_temp;		
-	}
-	else if (angle >= 0x2000 && angle < 0x4000)
-	{
-		lookup_angle = 0x4000 - angle;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = -y_temp;
-		*y = -x_temp;	
-	}
-	else if (angle >= 0x4000 && angle < 0x6000)
-	{
-		lookup_angle = angle - 0x4000;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = -y_temp;
-		*y = x_temp;	
-	}
-	else if (angle >= 0x6000 && angle < 0x8000)
-	{
-		lookup_angle = 0x8000 - angle;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = x_temp;
-		*y = -y_temp;	
-	}
-	else if (angle >= 0x8000 && angle < 0xA000)
-	{
-		lookup_angle = angle - 0x8000;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = -x_temp;
-		*y = -y_temp;	
-	}
-	else if (angle >= 0xA000 && angle < 0xC000)
-	{
-		lookup_angle = 0xC000 - angle;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = y_temp;
-		*y = x_temp;	
-	}
-	else if (angle >= 0xC000 && angle < 0xD000)
-	{
-		lookup_angle = angle - 0xC000;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = y_temp;
-		*y = -x_temp;	
-	}
-	else
-	{
-		lookup_angle = -angle;
-		analog = lookup(found_angle, lookup_angle, fullspeed);
-		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
-		
-		*x = -x_temp;
-		*y = y_temp;	
-	}
-}
-
-uint16_t lookup(uint16_t* found_angle, uint16_t angle, uint16_t fullspeed){
+static uint16_t lookup(uint16_t* found_angle, uint16_t angle, uint16_t fullspeed){
     uint16_t is_accessible_vc;
     uint16_t is_fullspeed;
+    uint16_t lower_val;
+    uint16_t lower_idx;
+    uint16_t upper_val;
+    uint16_t upper_idx;
+    uint16_t i;
 
 	if (angle < angle_tbl[0]/2){
         *found_angle = 0x0;
 		return 0x010F; // encoded result for cardinal up (0,67)
 	}
 	else if (angle <= angle_tbl[0]){
+        *found_angle = angle_tbl[0];
 		return analog_tbl[0];
+    }
 
 	lower_val = angle_tbl[0];
 	lower_idx = 0;
-	}
 
 	// Finding the best candidate:
 	for (i = 1; i < sizeof(angle_tbl)/sizeof(angle_tbl[0]); i++){
@@ -343,10 +255,10 @@ uint16_t lookup(uint16_t* found_angle, uint16_t angle, uint16_t fullspeed){
 		if (settings->bits.wiivc_cam && !is_accessible_vc){}
         else if (fullspeed && !is_fullspeed){}
         else{
-         {
 			upper_val = angle_tbl[i];
 			upper_idx = i;
 			if (upper_val == angle){
+                *found_angle = upper_val;
 				return analog_tbl[i];
 			}
 			else if (upper_val > angle){
@@ -360,9 +272,107 @@ uint16_t lookup(uint16_t* found_angle, uint16_t angle, uint16_t fullspeed){
 				}
 			}
 			lower_val = upper_val;
-			lower_ix = upper_idx;
+			lower_idx = upper_idx;
 		}
 	}
     *found_angle = 0x2000;
 	return 0x870F; // encoded result for diagonal (67,67)
+}
+
+static void find_best_analog(int16_t* x, int16_t* y, uint16_t* found_angle, uint16_t full_angle, uint16_t fullspeed){
+	int16_t x_temp;
+	int16_t y_temp;
+	uint16_t is_accessible_vc;
+	uint16_t is_fullspeed;
+    uint16_t angle;
+    uint16_t analog;
+	uint16_t lookup_angle;
+	
+    angle = full_angle - z64_camera_angle;
+	if (angle < 0x2000)
+	{
+		lookup_angle = angle;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = *found_angle;
+		*x = x_temp;
+		*y = y_temp;		
+	}
+	else if (angle < 0x4000)
+	{
+		lookup_angle = 0x4000 - angle;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = 0x4000 - *found_angle;
+		*x = -y_temp;
+		*y = -x_temp;	
+	}
+	else if (angle < 0x6000)
+	{
+		lookup_angle = angle - 0x4000;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = *found_angle + 0x4000;
+		*x = -y_temp;
+		*y = x_temp;	
+	}
+	else if (angle < 0x8000)
+	{
+		lookup_angle = 0x8000 - angle;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = 0x8000 - *found_angle;
+		*x = x_temp;
+		*y = -y_temp;	
+	}
+	else if (angle < 0xA000)
+	{
+		lookup_angle = angle - 0x8000;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = *found_angle + 0x8000;
+		*x = -x_temp;
+		*y = -y_temp;	
+	}
+	else if (angle < 0xC000)
+	{
+		lookup_angle = 0xC000 - angle;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = 0xC000 - *found_angle;
+		*x = y_temp;
+		*y = x_temp;	
+	}
+	else if (angle < 0xE000)
+	{
+		lookup_angle = angle - 0xC000;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = *found_angle + 0xC000;
+		*x = y_temp;
+		*y = -x_temp;	
+	}
+	else
+	{
+		lookup_angle = -angle;
+		analog = lookup(found_angle, lookup_angle, fullspeed);
+		unpack_analog(analog, &x_temp, &y_temp, &is_accessible_vc, &is_fullspeed);
+		
+        *found_angle = -*found_angle;
+		*x = -x_temp;
+		*y = y_temp;	
+	}
+    *found_angle = *found_angle + z64_camera_angle;
+}
+
+void gz_angle_finder(){
+    if (settings->bits.angle_finder)
+        find_best_analog(&gz.angle_x, &gz.angle_y, &gz.angle_best_matching, gz.angle_desired, 1);
 }
