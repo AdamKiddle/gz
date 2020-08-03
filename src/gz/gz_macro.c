@@ -527,6 +527,21 @@ static void quick_play_proc(struct menu_item *item, void *data)
   }
 }
 
+static int angle_finder_proc(struct menu_item *item,
+                               enum menu_callback_reason reason,
+                               void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON)
+    settings->bits.angle_finder = 1;
+  else if (reason == MENU_CALLBACK_SWITCH_OFF)
+    settings->bits.angle_finder = 0;
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_checkbox_get(item) != settings->bits.angle_finder)
+      menu_checkbox_set(item, settings->bits.angle_finder);
+  }
+  return 0;
+}
+
 static int hack_oca_input_proc(struct menu_item *item,
                                enum menu_callback_reason reason,
                                void *data)
@@ -744,8 +759,10 @@ struct menu *gz_macro_menu(void)
   item->tooltip = "quick play movie";
   /* create settings controls */
   menu_add_submenu(&menu, 0, 15, &menu_settings, "settings");
+    /* create tools controls */
+  menu_add_submenu(&menu, 0, 16, &menu_tools, "tools");
   /* create virtual controller controls */
-  menu_add_submenu(&menu, 0, 16, &menu_vcont, "virtual controller");
+  menu_add_submenu(&menu, 0, 17, &menu_vcont, "virtual controller");
   /* create tooltip */
   menu_add_tooltip(&menu, 8, 0, gz.menu_main, 0xC0C0C0);
 
@@ -762,6 +779,21 @@ struct menu *gz_macro_menu(void)
   menu_add_static(&menu_settings, 0, 5, "game settings", 0xC0C0C0);
   menu_add_checkbox(&menu_settings, 2, 6, wiivc_cam_proc, NULL);
   menu_add_static(&menu_settings, 4, 6, "wii vc camera", 0xC0C0C0);
+
+  /* populate tools menu */
+  // TODO: menu_tools undefined
+  menu_tools.selector = menu_add_submenu(&menu_tools, 0, 0, NULL,
+                                            "return");
+  menu_add_checkbox(&menu_tools, 0, 1, angle_finder_proc, NULL);
+  menu_add_static(&menu_tools, 2, 1, "angle finder", 0xC0C0C0);
+  menu_add_static(&menu_tools, 2, 2, "desired angle", 0xC0C0C0);
+  menu_add_intinput(&menu_tools, 6, 2, 16, 4,
+                  halfword_mod_proc, &gz.desired_angle); // TODO: gz.desired_angle undefined
+  menu_add_static(&menu_tools, 2, 3, "best match", 0xC0C0C0);
+  menu_add_static(&menu_tools, 6, 3, "TODO", 0xC0C0C0); // TODO
+
+  
+    
 
   /* populate virtual pad menu */
   menu_vcont.selector = menu_add_submenu(&menu_vcont, 0, 0, NULL, "return");

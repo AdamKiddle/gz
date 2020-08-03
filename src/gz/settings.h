@@ -118,6 +118,7 @@ struct settings_bits
   uint32_t timer           : 1;
   uint32_t pause_display   : 1;
   uint32_t macro_input     : 1;
+  uint32_t angle_finder    : 1;
   uint32_t hack_oca_input  : 1;
   uint32_t hack_oca_sync   : 1;
   uint32_t hack_room_load  : 1;
