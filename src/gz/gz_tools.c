@@ -1,6 +1,5 @@
 #include "gz.h"
 #include "z64.h"
-#include "settings.h"
 
 static uint16_t angle_tbl[] = {
 	0x00AD, 0x00AD, 0x00B7, 0x00B7, 0x00B7, 0x00C2, 0x00C2, 0x00C2, 0x00CC, 0x00CC, 0x00CC, 0x00D6, 0x00D6, 0x00E0, 0x00E0, 0x00EA, 0x00EA, 
@@ -373,6 +372,6 @@ static void find_best_analog(int16_t* x, int16_t* y, uint16_t* found_angle, uint
 }
 
 void gz_angle_finder(){
-    if (settings->bits.angle_finder)
+    if (gz.angle_enable)
         find_best_analog(&gz.angle_x, &gz.angle_y, &gz.angle_best_matching, gz.angle_desired, 1);
 }

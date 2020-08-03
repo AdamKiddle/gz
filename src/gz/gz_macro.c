@@ -592,12 +592,12 @@ static int angle_finder_proc(struct menu_item *item,
                                void *data)
 {
   if (reason == MENU_CALLBACK_SWITCH_ON)
-    settings->bits.angle_finder = 1;
+    gz.angle_enable = 1;
   else if (reason == MENU_CALLBACK_SWITCH_OFF)
-    settings->bits.angle_finder = 0;
+    gz.angle_enable = 0;
   else if (reason == MENU_CALLBACK_THINK) {
-    if (menu_checkbox_get(item) != settings->bits.angle_finder)
-      menu_checkbox_set(item, settings->bits.angle_finder);
+    if (menu_checkbox_get(item) != gz.angle_enable)
+      menu_checkbox_set(item, gz.angle_enable);
   }
   return 0;
 }
@@ -641,7 +641,7 @@ static int angle_best_matching_proc(struct menu_item *item,
   uint32_t color = draw_params->color;
   uint8_t alpha = draw_params->alpha;
   gfx_mode_set(GFX_MODE_COLOR, GPACK_RGB24A8(color, alpha));
-  if (settings->bits.angle_finder)
+  if (gz.angle_enable)
     val = gz.angle_best_matching;
   else
     val = 0;
@@ -659,7 +659,7 @@ static int angle_x_proc(struct menu_item *item,
   uint32_t color = draw_params->color;
   uint8_t alpha = draw_params->alpha;
   gfx_mode_set(GFX_MODE_COLOR, GPACK_RGB24A8(color, alpha));
-  if (settings->bits.angle_finder)
+  if (gz.angle_enable)
     val = gz.angle_x;
   else
     val = 0;
@@ -677,7 +677,7 @@ static int angle_y_proc(struct menu_item *item,
   uint32_t color = draw_params->color;
   uint8_t alpha = draw_params->alpha;
   gfx_mode_set(GFX_MODE_COLOR, GPACK_RGB24A8(color, alpha));
-  if (settings->bits.angle_finder)
+  if (gz.angle_enable)
     val = gz.angle_y;
   else
     val = 0;

@@ -561,7 +561,7 @@ HOOK void input_hook(void)
         }
       z64_UpdateCtxtInput(&z64_ctxt);
       mask_input(&zi[0]);
-      if (settings->bits.angle_finder && gz.angle_use_input)
+      if (gz.angle_enable && gz.angle_use_input)
           gz_angle_input_get(&zi[0]);
       else
       {
@@ -1037,6 +1037,7 @@ static void init(void)
   gz.movie_room_load_pos = 0;
   gz.angle_desired = 0;
   gz.angle_best_matching = 0;
+  gz.angle_enable = 0;
   gz.angle_x = 0;
   gz.angle_y = 0;
   gz.angle_use_input = 0;

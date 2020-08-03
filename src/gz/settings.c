@@ -43,7 +43,6 @@ void settings_load_default(void)
   d->bits.timer = 0;
   d->bits.pause_display = 1;
   d->bits.macro_input = 0;
-  d->bits.angle_finder = 0;
   d->bits.hack_oca_input = 1;
   d->bits.hack_oca_sync = 1;
   d->bits.hack_room_load = 1;
