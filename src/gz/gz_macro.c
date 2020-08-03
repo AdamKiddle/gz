@@ -617,45 +617,57 @@ static int angle_desired_proc(struct menu_item *item,
 }
 
 static int angle_best_matching_proc(struct menu_item *item,
-                             enum menu_callback_reason reason,
-                             void *data)
+                                struct menu_draw_params *draw_params)
 {
-  if (reason == MENU_CALLBACK_CHANGED) {
-    gz.angle_best_matching = menu_intinput_get(item);
-  }
-  else if (reason == MENU_CALLBACK_THINK) {
-    if (menu_intinput_gets(item) != gz.angle_best_matching)
-      menu_intinput_set(item, gz.angle_best_matching);
-  }
-  return 0;
+  struct gfx_font *font = draw_params->font;
+  int x = draw_params->x;
+  int y = draw_params->y;
+  uint16_t val; 
+  uint32_t color = draw_params->color;
+  uint8_t alpha = draw_params->alpha;
+  gfx_mode_set(GFX_MODE_COLOR, GPACK_RGB24A8(color, alpha));
+  if (settings->bits.angle_finder)
+    val = gz.angle_best_matching;
+  else
+    val = 0;
+  gfx_printf(font, x, y, "%04x", val);
+  return 1;
 }
 
 static int angle_x_proc(struct menu_item *item,
-                             enum menu_callback_reason reason,
-                             void *data)
+                                struct menu_draw_params *draw_params)
 {
-  if (reason == MENU_CALLBACK_CHANGED) {
-    gz.angle_x = menu_intinput_gets(item);
-  }
-  else if (reason == MENU_CALLBACK_THINK) {
-    if (menu_intinput_gets(item) != gz.angle_x)
-      menu_intinput_set(item, gz.angle_x);
-  }
-  return 0;
+  struct gfx_font *font = draw_params->font;
+  int x = draw_params->x;
+  int y = draw_params->y;
+  int16_t val; 
+  uint32_t color = draw_params->color;
+  uint8_t alpha = draw_params->alpha;
+  gfx_mode_set(GFX_MODE_COLOR, GPACK_RGB24A8(color, alpha));
+  if (settings->bits.angle_finder)
+    val = gz.angle_x;
+  else
+    val = 0;
+  gfx_printf(font, x, y, "%3i", val);
+  return 1;
 }
 
 static int angle_y_proc(struct menu_item *item,
-                             enum menu_callback_reason reason,
-                             void *data)
+                                struct menu_draw_params *draw_params)
 {
-  if (reason == MENU_CALLBACK_CHANGED) {
-    gz.angle_y = menu_intinput_gets(item);
-  }
-  else if (reason == MENU_CALLBACK_THINK) {
-    if (menu_intinput_gets(item) != gz.angle_y)
-      menu_intinput_set(item, gz.angle_y);
-  }
-  return 0;
+  struct gfx_font *font = draw_params->font;
+  int x = draw_params->x;
+  int y = draw_params->y;
+  int16_t val; 
+  uint32_t color = draw_params->color;
+  uint8_t alpha = draw_params->alpha;
+  gfx_mode_set(GFX_MODE_COLOR, GPACK_RGB24A8(color, alpha));
+  if (settings->bits.angle_finder)
+    val = gz.angle_y;
+  else
+    val = 0;
+  gfx_printf(font, x, y, "%3i", val);
+  return 1;
 }
 
 static int vcont_enable_proc(struct menu_item *item,
@@ -847,15 +859,9 @@ struct menu *gz_macro_menu(void)
   menu_add_intinput(&menu_tools, 11, 2, 16, 4,
                   angle_desired_proc, &gz.angle_desired);
   menu_add_static(&menu_tools, 2, 3, "closest", 0xC0C0C0);
-  menu_add_intinput(&menu_tools, 11, 3, 16, 4,
-                  angle_best_matching_proc, &gz.angle_best_matching);
-  menu_add_intinput(&menu_tools, 17, 3, -10, 4,
-                  angle_x_proc, &gz.angle_x);
-  menu_add_intinput(&menu_tools, 22, 3, -10, 4,
-                  angle_y_proc, &gz.angle_y);
-
-  
-    
+  menu_add_static_custom(&menu_tools, 11, 3, angle_best_matching_proc, NULL, 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 16, 3, angle_x_proc, NULL, 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 20, 3, angle_y_proc, NULL, 0xC0C0C0);
 
   /* populate virtual pad menu */
   menu_vcont.selector = menu_add_submenu(&menu_vcont, 0, 0, NULL, "return");
