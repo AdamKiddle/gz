@@ -1558,9 +1558,7 @@ typedef struct
   uint16_t          camera_flag_1;            /* 0x0033E */
   char              unk_0x340[0x016C];        /* 0x00340 */
   int16_t           event_flag;               /* 0x004AC */
-  //char              unk_0x4AE[0x02F6];        /* 0x004AE */
-  char              unk_0x4AE[0x02E2];        /* 0x004AE */
-  z64_camera_t           *cameraPtrs[4];
+  char              unk_0x4AE[0x02F6];        /* 0x004AE */
   uint8_t           seq_idx;                  /* 0x007A4 */
   uint8_t           night_sfx;                /* 0x007A5 */
   char              unk_0x7A6[0x0002];        /* 0x007A6 */
