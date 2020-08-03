@@ -527,21 +527,6 @@ static void quick_play_proc(struct menu_item *item, void *data)
   }
 }
 
-static int angle_finder_proc(struct menu_item *item,
-                               enum menu_callback_reason reason,
-                               void *data)
-{
-  if (reason == MENU_CALLBACK_SWITCH_ON)
-    settings->bits.angle_finder = 1;
-  else if (reason == MENU_CALLBACK_SWITCH_OFF)
-    settings->bits.angle_finder = 0;
-  else if (reason == MENU_CALLBACK_THINK) {
-    if (menu_checkbox_get(item) != settings->bits.angle_finder)
-      menu_checkbox_set(item, settings->bits.angle_finder);
-  }
-  return 0;
-}
-
 static int hack_oca_input_proc(struct menu_item *item,
                                enum menu_callback_reason reason,
                                void *data)
@@ -602,6 +587,21 @@ static int wiivc_cam_proc(struct menu_item *item,
   return 0;
 }
 
+static int angle_finder_proc(struct menu_item *item,
+                               enum menu_callback_reason reason,
+                               void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON)
+    settings->bits.angle_finder = 1;
+  else if (reason == MENU_CALLBACK_SWITCH_OFF)
+    settings->bits.angle_finder = 0;
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_checkbox_get(item) != settings->bits.angle_finder)
+      menu_checkbox_set(item, settings->bits.angle_finder);
+  }
+  return 0;
+}
+
 static int angle_desired_proc(struct menu_item *item,
                              enum menu_callback_reason reason,
                              void *data)
@@ -614,6 +614,21 @@ static int angle_desired_proc(struct menu_item *item,
       menu_intinput_set(item, gz.angle_desired);
   }
   return 0;
+}
+
+static void angle_invert_proc(struct menu_item *item, void *data)
+{
+  gz.angle_desired = gz.angle_desired + 0x8000;
+}
+
+static void angle_left_proc(struct menu_item *item, void *data)
+{
+  gz.angle_desired = gz.angle_desired + 0x4000;
+}
+
+static void angle_right_proc(struct menu_item *item, void *data)
+{
+  gz.angle_desired = gz.angle_desired - 0x4000;
 }
 
 static int angle_best_matching_proc(struct menu_item *item,
@@ -668,6 +683,21 @@ static int angle_y_proc(struct menu_item *item,
     val = 0;
   gfx_printf(font, x, y, "%3i", val);
   return 1;
+}
+
+static int angle_use_input_proc(struct menu_item *item,
+                               enum menu_callback_reason reason,
+                               void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON)
+    gz.angle_use_input = 1;
+  else if (reason == MENU_CALLBACK_SWITCH_OFF)
+    gz.angle_use_input = 0;
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_checkbox_get(item) != gz.angle_use_input)
+      menu_checkbox_set(item, gz.angle_use_input);
+  }
+  return 0;
 }
 
 static int vcont_enable_proc(struct menu_item *item,
@@ -858,10 +888,16 @@ struct menu *gz_macro_menu(void)
   menu_add_static(&menu_tools, 2, 2, "desired", 0xC0C0C0);
   menu_add_intinput(&menu_tools, 11, 2, 16, 4,
                   angle_desired_proc, &gz.angle_desired);
+  menu_add_button(&menu_tools, 16, 2, "invert", angle_invert_proc, NULL);
+  menu_add_button(&menu_tools, 23, 2, "left", angle_left_proc, NULL);
+  menu_add_button(&menu_tools, 28, 2, "right", angle_right_proc, NULL);
   menu_add_static(&menu_tools, 2, 3, "closest", 0xC0C0C0);
   menu_add_static_custom(&menu_tools, 11, 3, angle_best_matching_proc, NULL, 0xC0C0C0);
   menu_add_static_custom(&menu_tools, 16, 3, angle_x_proc, NULL, 0xC0C0C0);
   menu_add_static_custom(&menu_tools, 20, 3, angle_y_proc, NULL, 0xC0C0C0);
+  
+  menu_add_static(&menu_tools, 2, 4, "use input", 0xC0C0C0);
+  menu_add_checkbox(&menu_tools, 13, 4, angle_use_input_proc, NULL);
 
   /* populate virtual pad menu */
   menu_vcont.selector = menu_add_submenu(&menu_vcont, 0, 0, NULL, "return");
@@ -899,6 +935,20 @@ struct menu *gz_macro_menu(void)
   }
 
   return &menu;
+}
+
+void gz_angle_input_get(z64_input_t *input)
+{
+  input->raw_prev = input->raw;
+  input->status_prev = input->status;
+
+  input->raw.x = gz.angle_x;
+  input->raw.y = gz.angle_y;
+
+  input->x_diff += (input->raw.x - input->raw_prev.x);
+  input->y_diff += (input->raw.y - input->raw_prev.y);
+  input->adjusted_x = zu_adjust_joystick(input->raw.x);
+  input->adjusted_y = zu_adjust_joystick(input->raw.y);
 }
 
 void gz_vcont_set(int port, _Bool plugged, z64_controller_t *cont)

@@ -561,12 +561,17 @@ HOOK void input_hook(void)
         }
       z64_UpdateCtxtInput(&z64_ctxt);
       mask_input(&zi[0]);
-      for (int i = 0; i < 4; ++i)
-        if (gz.vcont_enabled[i]) {
-          zi[i].raw = raw_save[i];
-          zi[i].status = status_save[i];
-          gz_vcont_get(i, &zi[i]);
-        }
+      if (settings->bits.angle_finder && gz.angle_use_input)
+          gz_angle_input_get(&zi[0]);
+      else
+      {
+        for (int i = 0; i < 4; ++i)
+          if (gz.vcont_enabled[i]) {
+            zi[i].raw = raw_save[i];
+            zi[i].status = status_save[i];
+            gz_vcont_get(i, &zi[i]);
+          }
+      }
     }
     if (gz.movie_state == MOVIE_RECORDING) {
       if (gz.movie_frame >= gz.movie_input.size) {
@@ -1030,6 +1035,11 @@ static void init(void)
   gz.movie_oca_input_pos = 0;
   gz.movie_oca_sync_pos = 0;
   gz.movie_room_load_pos = 0;
+  gz.angle_desired = 0;
+  gz.angle_best_matching = 0;
+  gz.angle_x = 0;
+  gz.angle_y = 0;
+  gz.angle_use_input = 0;
   gz.z_input_mask.pad = 0;
   gz.z_input_mask.x = 0;
   gz.z_input_mask.y = 0;
