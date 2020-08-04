@@ -906,14 +906,14 @@ struct menu *gz_macro_menu(void)
   menu_add_button(&menu_tools, 16, 2, "invert", angle_invert_proc, NULL);
   menu_add_button(&menu_tools, 11, 3, "left", angle_left_proc, NULL);
   menu_add_button(&menu_tools, 16, 3, "right", angle_right_proc, NULL);
-  menu_add_static(&menu_tools, 2, 4, "closest", 0xC0C0C0);
-  menu_add_static_custom(&menu_tools, 11, 4, angle_best_matching_proc, NULL, 0xC0C0C0);
-  menu_add_static_custom(&menu_tools, 16, 4, angle_x_proc, NULL, 0xC0C0C0);
-  menu_add_static_custom(&menu_tools, 20, 4, angle_y_proc, NULL, 0xC0C0C0);
-  menu_add_static(&menu_tools, 2, 5, "full speed", 0xC0C0C0);
-  menu_add_checkbox(&menu_tools, 13, 5, angle_full_speed_proc, NULL);
-  menu_add_static(&menu_tools, 2, 6, "use input", 0xC0C0C0);
-  menu_add_checkbox(&menu_tools, 13, 6, angle_use_input_proc, NULL);
+  menu_add_static(&menu_tools, 2, 5, "closest", 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 11, 5, angle_best_matching_proc, NULL, 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 16, 5, angle_x_proc, NULL, 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 20, 5, angle_y_proc, NULL, 0xC0C0C0);
+  menu_add_static(&menu_tools, 2, 6, "full speed", 0xC0C0C0);
+  menu_add_checkbox(&menu_tools, 13, 6, angle_full_speed_proc, NULL);
+  menu_add_static(&menu_tools, 2, 7, "use input", 0xC0C0C0);
+  menu_add_checkbox(&menu_tools, 13, 7, angle_use_input_proc, NULL);
 
   /* populate virtual pad menu */
   menu_vcont.selector = menu_add_submenu(&menu_vcont, 0, 0, NULL, "return");
