@@ -685,6 +685,21 @@ static int angle_y_proc(struct menu_item *item,
   return 1;
 }
 
+static int angle_full_speed_proc(struct menu_item *item,
+                               enum menu_callback_reason reason,
+                               void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON)
+    gz.angle_full_speed = 1;
+  else if (reason == MENU_CALLBACK_SWITCH_OFF)
+    gz.angle_full_speed = 0;
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_checkbox_get(item) != gz.angle_full_speed)
+      menu_checkbox_set(item, gz.angle_full_speed);
+  }
+  return 0;
+}
+
 static int angle_use_input_proc(struct menu_item *item,
                                enum menu_callback_reason reason,
                                void *data)
@@ -889,15 +904,16 @@ struct menu *gz_macro_menu(void)
   menu_add_intinput(&menu_tools, 11, 2, 16, 4,
                   angle_desired_proc, &gz.angle_desired);
   menu_add_button(&menu_tools, 16, 2, "invert", angle_invert_proc, NULL);
-  menu_add_button(&menu_tools, 23, 2, "left", angle_left_proc, NULL);
-  menu_add_button(&menu_tools, 28, 2, "right", angle_right_proc, NULL);
-  menu_add_static(&menu_tools, 2, 3, "closest", 0xC0C0C0);
-  menu_add_static_custom(&menu_tools, 11, 3, angle_best_matching_proc, NULL, 0xC0C0C0);
-  menu_add_static_custom(&menu_tools, 16, 3, angle_x_proc, NULL, 0xC0C0C0);
-  menu_add_static_custom(&menu_tools, 20, 3, angle_y_proc, NULL, 0xC0C0C0);
-  
-  menu_add_static(&menu_tools, 2, 4, "use input", 0xC0C0C0);
-  menu_add_checkbox(&menu_tools, 13, 4, angle_use_input_proc, NULL);
+  menu_add_button(&menu_tools, 11, 3, "left", angle_left_proc, NULL);
+  menu_add_button(&menu_tools, 16, 3, "right", angle_right_proc, NULL);
+  menu_add_static(&menu_tools, 2, 4, "closest", 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 11, 4, angle_best_matching_proc, NULL, 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 16, 4, angle_x_proc, NULL, 0xC0C0C0);
+  menu_add_static_custom(&menu_tools, 20, 4, angle_y_proc, NULL, 0xC0C0C0);
+  menu_add_static(&menu_tools, 2, 5, "full speed", 0xC0C0C0);
+  menu_add_checkbox(&menu_tools, 13, 5, angle_full_speed_proc, NULL);
+  menu_add_static(&menu_tools, 2, 6, "use input", 0xC0C0C0);
+  menu_add_checkbox(&menu_tools, 13, 6, angle_use_input_proc, NULL);
 
   /* populate virtual pad menu */
   menu_vcont.selector = menu_add_submenu(&menu_vcont, 0, 0, NULL, "return");

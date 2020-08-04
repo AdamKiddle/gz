@@ -373,5 +373,5 @@ static void find_best_analog(int16_t* x, int16_t* y, uint16_t* found_angle, uint
 
 void gz_angle_finder(){
     if (gz.angle_enable)
-        find_best_analog(&gz.angle_x, &gz.angle_y, &gz.angle_best_matching, gz.angle_desired, 1);
+        find_best_analog(&gz.angle_x, &gz.angle_y, &gz.angle_best_matching, gz.angle_desired, gz.angle_full_speed);
 }
