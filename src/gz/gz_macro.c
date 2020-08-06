@@ -685,17 +685,43 @@ static int angle_y_proc(struct menu_item *item,
   return 1;
 }
 
-static int angle_full_speed_proc(struct menu_item *item,
+static int angle_use_min_proc(struct menu_item *item,
                                enum menu_callback_reason reason,
                                void *data)
 {
   if (reason == MENU_CALLBACK_SWITCH_ON)
-    gz.angle_full_speed = 1;
+    gz.angle_use_min = 1;
   else if (reason == MENU_CALLBACK_SWITCH_OFF)
-    gz.angle_full_speed = 0;
+    gz.angle_use_min = 0;
   else if (reason == MENU_CALLBACK_THINK) {
-    if (menu_checkbox_get(item) != gz.angle_full_speed)
-      menu_checkbox_set(item, gz.angle_full_speed);
+    if (menu_checkbox_get(item) != gz.angle_use_min)
+      menu_checkbox_set(item, gz.angle_use_min);
+  }
+  return 0;
+}
+
+static int angle_r_min_proc(struct menu_item *item,
+                             enum menu_callback_reason reason,
+                             void *data)
+{
+uint8_t MAX_RADIUS = 84; 
+  if (reason == MENU_CALLBACK_CHANGED) {
+    if (menu_intinput_get(item) > MAX_RADIUS){
+      gz.angle_r_min = MAX_RADIUS;
+      menu_intinput_set(item, gz.angle_r_min);
+    }
+    else
+      gz.angle_r_min = menu_intinput_get(item);
+  }
+  else if (reason == MENU_CALLBACK_THINK) {
+    if (menu_intinput_get(item) > MAX_RADIUS){
+      gz.angle_r_min = MAX_RADIUS;
+      menu_intinput_set(item, gz.angle_r_min);
+    }
+    else if (menu_intinput_get(item) != gz.angle_r_min)
+      menu_intinput_set(item, gz.angle_r_min);
+    
+
   }
   return 0;
 }
@@ -902,7 +928,7 @@ struct menu *gz_macro_menu(void)
   menu_add_static(&menu_tools, 2, 1, "angle finder", 0xC0C0C0);
   menu_add_static(&menu_tools, 2, 2, "desired", 0xC0C0C0);
   menu_add_intinput(&menu_tools, 11, 2, 16, 4,
-                  angle_desired_proc, &gz.angle_desired);
+                  angle_desired_proc, NULL);
   menu_add_button(&menu_tools, 16, 2, "invert", angle_invert_proc, NULL);
   menu_add_button(&menu_tools, 11, 3, "left", angle_left_proc, NULL);
   menu_add_button(&menu_tools, 16, 3, "right", angle_right_proc, NULL);
@@ -910,8 +936,10 @@ struct menu *gz_macro_menu(void)
   menu_add_static_custom(&menu_tools, 11, 5, angle_best_matching_proc, NULL, 0xC0C0C0);
   menu_add_static_custom(&menu_tools, 16, 5, angle_x_proc, NULL, 0xC0C0C0);
   menu_add_static_custom(&menu_tools, 20, 5, angle_y_proc, NULL, 0xC0C0C0);
-  menu_add_static(&menu_tools, 2, 6, "full speed", 0xC0C0C0);
-  menu_add_checkbox(&menu_tools, 13, 6, angle_full_speed_proc, NULL);
+  menu_add_static(&menu_tools, 2, 6, "min radius", 0xC0C0C0);
+  menu_add_checkbox(&menu_tools, 13, 6, angle_use_min_proc, NULL);
+  menu_add_intinput(&menu_tools, 16, 6, 10, 2,
+                  angle_r_min_proc, NULL);
   menu_add_static(&menu_tools, 2, 7, "use input", 0xC0C0C0);
   menu_add_checkbox(&menu_tools, 13, 7, angle_use_input_proc, NULL);
 

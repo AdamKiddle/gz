@@ -1040,7 +1040,8 @@ static void init(void)
   gz.angle_enable = 0;
   gz.angle_x = 0;
   gz.angle_y = 0;
-  gz.angle_full_speed = 0;
+  gz.angle_use_min = 0;
+  gz.angle_r_min = 59;
   gz.angle_use_input = 0;
   gz.z_input_mask.pad = 0;
   gz.z_input_mask.x = 0;

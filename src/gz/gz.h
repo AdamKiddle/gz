@@ -149,7 +149,8 @@ struct gz
   uint16_t              angle_best_matching;
   int16_t               angle_x;
   int16_t               angle_y;
-  _Bool                 angle_full_speed;
+  _Bool                 angle_use_min;
+  uint16_t              angle_r_min;
   _Bool                 angle_use_input;
   enum movie_state      movie_state;
   z64_controller_t      movie_input_start;
