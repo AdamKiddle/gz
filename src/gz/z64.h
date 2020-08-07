@@ -1554,7 +1554,7 @@ typedef struct
   z64_actor_t      *camera_focus;             /* 0x00270 */
   char              unk_0x274[0x00A2];        /* 0x00274 */
   uint16_t          camera_angle;             /* 0x00316 */
-  char              unk_0x274[0x000A];        /* 0x00318 */
+  char              unk_0x318[0x000A];        /* 0x00318 */
   uint16_t          camera_mode;              /* 0x00322 */
   char              unk_0x324[0x001A];        /* 0x00324 */
   uint16_t          camera_flag_1;            /* 0x0033E */
