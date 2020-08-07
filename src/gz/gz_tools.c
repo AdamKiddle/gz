@@ -150,22 +150,22 @@ static uint16_t analog_tbl[] = {
 
 // converts the values in the lookup table to x and y analog values, and a flag.
 static void unpack_analog(uint16_t analog, int16_t* x, int16_t* y, uint16_t* is_accessible_vc){
-	*x = -(int16_t)((analog & 0xFE00) >> 9);
-	*y =  (int16_t)((analog & 0x01FE) >> 1);
-	*is_accessible_vc = (analog & 0x0001);
+  *x = -(int16_t)((analog & 0xFE00) >> 9);
+  *y =  (int16_t)((analog & 0x01FE) >> 1);
+  *is_accessible_vc = (analog & 0x0001);
 }
 
 static int16_t adjust_analog(int16_t x){
-	if (8 > x && x > -8)
-		return 0;
-	else if (x > 67)
-		return 60;
-	else if (x < -67)
-		return -60;
-	else if (x < 0)
-		return x + 7;
-	else
-		return x - 7;
+  if (8 > x && x > -8)
+    return 0;
+  else if (x > 67)
+    return 60;
+  else if (x < -67)
+    return -60;
+  else if (x < 0)
+    return x + 7;
+  else
+    return x - 7;
 }
 
 static uint16_t lookup(uint16_t* found_angle, uint16_t angle, uint16_t r_min){
@@ -175,16 +175,15 @@ static uint16_t lookup(uint16_t* found_angle, uint16_t angle, uint16_t r_min){
     uint16_t upper_val;
     uint16_t upper_idx;
     uint16_t i;
-	int16_t x;
-	int16_t y;
+    int16_t x;
+    int16_t y;
 
-	// Finding the first eligible lower boundary
-	for (i = 0; i < sizeof(angle_tbl)/sizeof(angle_tbl[0]); i++){
-		unpack_analog(analog_tbl[i], &x, &y, &is_accessible_vc);
-		x = adjust_analog(x);
-		y = adjust_analog(y);
-		// somehow very low radius values are slipping through. not sure how.
-		if ((!settings->bits.wiivc_cam || is_accessible_vc) && (x*x + y*y >= r_min*r_min)){
+    // Finding the first eligible lower boundary
+    for (i = 0; i < sizeof(angle_tbl)/sizeof(angle_tbl[0]); i++){
+        unpack_analog(analog_tbl[i], &x, &y, &is_accessible_vc);
+        x = adjust_analog(x);
+        y = adjust_analog(y);
+        if ((!settings->bits.wiivc_cam || is_accessible_vc) && (x*x + y*y >= r_min*r_min)){
 		    if (angle_tbl[i] >= angle){
 				*found_angle = angle_tbl[i];
 				return analog_tbl[i];
@@ -325,7 +324,5 @@ void gz_angle_finder(){
 			find_best_analog(&gz.angle_x, &gz.angle_y, &gz.angle_best_matching, gz.angle_desired, gz.angle_r_min);
 		else
 			find_best_analog(&gz.angle_x, &gz.angle_y, &gz.angle_best_matching, gz.angle_desired, 0);
-	}
-
-        
+	}        
 }
