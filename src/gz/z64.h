@@ -1552,7 +1552,9 @@ typedef struct
   float             unk_0xDC;                 /* 0x000DC */
   char              unk_0xE0[0x0190];         /* 0x000E0 */
   z64_actor_t      *camera_focus;             /* 0x00270 */
-  char              unk_0x274[0x00AE];        /* 0x00274 */
+  char              unk_0x274[0x00A2];        /* 0x00274 */
+  uint16_t          camera_angle;             /* 0x00316 */
+  char              unk_0x274[0x000A];        /* 0x00318 */
   uint16_t          camera_mode;              /* 0x00322 */
   char              unk_0x324[0x001A];        /* 0x00324 */
   uint16_t          camera_flag_1;            /* 0x0033E */
@@ -2253,7 +2255,6 @@ z64_extern  char                  z64_zimg[];
 z64_extern  char                  z64_disp[];
 z64_extern  z64_ctxt_t            z64_ctxt;
 z64_extern  z64_game_t            z64_game;
-z64_extern  uint16_t              z64_camera_angle;
 z64_extern  z64_link_t            z64_link;
 z64_extern  char                  z64_cimg[];
 z64_extern  char                  z64_item_highlight_vram[];

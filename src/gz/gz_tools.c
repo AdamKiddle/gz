@@ -235,7 +235,7 @@ static void find_best_analog(int16_t* x, int16_t* y, uint16_t* found_angle, uint
     uint16_t analog;
 	uint16_t lookup_angle;
 	
-    angle = full_angle - z64_camera_angle;
+    angle = full_angle - z64_game->camera_angle;
 	if (angle < 0x2000)
 	{
 		lookup_angle = angle;
@@ -316,7 +316,7 @@ static void find_best_analog(int16_t* x, int16_t* y, uint16_t* found_angle, uint
 		*x = -x_temp;
 		*y = y_temp;	
 	}
-    *found_angle = *found_angle + z64_camera_angle;
+    *found_angle = *found_angle + z64_game->camera_angle;
 }
 
 void gz_angle_finder(){
