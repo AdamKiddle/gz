@@ -176,6 +176,7 @@ struct gz
   _Bool                 free_cam;
   _Bool                 lock_cam;
   enum cam_mode         cam_mode;
+  _Bool                 cam_draw_textures;
   enum cam_bhv          cam_bhv;
   int16_t               cam_dist_min;
   int16_t               cam_dist_max;
@@ -189,6 +190,7 @@ struct gz
   uint8_t               state_slot;
   _Bool                 reset_flag;
   _Bool                 frame_flag;
+  _Bool                 early_view_flag;
 };
 
 void          gz_apply_settings();

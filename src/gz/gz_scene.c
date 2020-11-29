@@ -277,6 +277,21 @@ static int cam_mode_proc(struct menu_item *item,
   return 0;
 }
 
+static int cam_draw_textures_proc(struct menu_item *item,
+                         enum menu_callback_reason reason,
+                         void *data)
+{
+  if (reason == MENU_CALLBACK_SWITCH_ON) {
+    gz.cam_draw_textures = 1;
+  }
+  else if (reason == MENU_CALLBACK_SWITCH_OFF) {
+    gz.cam_draw_textures = 0;
+  }
+  else if (reason == MENU_CALLBACK_THINK)
+    menu_checkbox_set(item, gz.cam_draw_textures);
+  return 0;
+}
+
 static int cam_bhv_proc(struct menu_item *item,
                         enum menu_callback_reason reason,
                         void *data)
@@ -436,15 +451,17 @@ struct menu *gz_scene_menu(void)
   menu_add_checkbox(&camera, 16, 2, lock_cam_proc, NULL);
   menu_add_static(&camera, 0, 3, "mode", 0xC0C0C0);
   menu_add_option(&camera, 16, 3, "camera\0" "view\0", cam_mode_proc, NULL);
-  menu_add_static(&camera, 0, 4, "behavior", 0xC0C0C0);
-  menu_add_option(&camera, 16, 4,
+  menu_add_static(&camera, 0, 4, "draw textures", 0xC0C0C0);
+  menu_add_checkbox(&camera, 16, 4, cam_draw_textures_proc, NULL);
+  menu_add_static(&camera, 0, 5, "behavior", 0xC0C0C0);
+  menu_add_option(&camera, 16, 5,
                   "manual\0" "birdseye follow\0" "radial follow\0",
                   cam_bhv_proc, NULL);
-  menu_add_static(&camera, 0, 5, "distance min", 0xC0C0C0);
-  menu_add_intinput(&camera, 16, 5, -10, 5, cam_dist_min_proc, NULL);
-  menu_add_static(&camera, 0, 6, "distance max", 0xC0C0C0);
-  menu_add_intinput(&camera, 16, 6, -10, 5, cam_dist_max_proc, NULL);
-  menu_add_button(&camera, 16, 7, "reset", reset_cam_proc, item);
+  menu_add_static(&camera, 0, 6, "distance min", 0xC0C0C0);
+  menu_add_intinput(&camera, 16, 6, -10, 5, cam_dist_min_proc, NULL);
+  menu_add_static(&camera, 0, 7, "distance max", 0xC0C0C0);
+  menu_add_intinput(&camera, 16, 7, -10, 5, cam_dist_max_proc, NULL);
+  menu_add_button(&camera, 16, 8, "reset", reset_cam_proc, item);
 
   return &menu;
 }

@@ -996,6 +996,61 @@ HOOK void camera_hook(void *camera)
   vec3f_add(camera_at, camera_eye, &vf);
 }
 
+HOOK void draw_skybox_hook(void* skyboxCtx, void* gfxCtx, int16_t skyboxId, int16_t alpha, float x, float y, float z)
+{
+  if (!gz.ready || !gz.free_cam || gz.cam_mode != CAMMODE_VIEW || !gz.cam_draw_textures)
+    return z64_DrawSkybox(skyboxCtx, gfxCtx, skyboxId, alpha, x,y,z);
+
+  // update gz cam early so that we use the correct gz.cam_pos to draw the skybox around
+  gz.early_view_flag = 1;
+  gz_update_cam();
+  z64_DrawSkybox(skyboxCtx, gfxCtx, skyboxId, alpha, gz.cam_pos.x, gz.cam_pos.y, gz.cam_pos.z);
+}
+
+HOOK void set_11DA0_hook(Mtx* viewing, MtxF* mf_11DA0){
+  /* Call here usually sets the MtxF "globalCtx->mf_11DA0" based on camera coordinates/angle.
+   * Here we use gz's freecam position/angle to calculate this matrix instead, causing textures
+   * to draw relative to freecam.
+   */
+  if (!gz.free_cam || gz.cam_mode != CAMMODE_VIEW || !gz.cam_draw_textures){
+    zu_MtxToMtxF(viewing, mf_11DA0);
+    return;
+  }
+  z64_xyzf_t at;
+  z64_xyzf_t up;
+  vec3f_py(&at, gz.cam_pitch, gz.cam_yaw);
+  vec3f_add(&at, &gz.cam_pos, &at);
+  vec3f_py(&up, gz.cam_pitch - M_PI / 2.f, gz.cam_yaw);
+  MtxF mf_lookat;
+  guLookAtF(&mf_lookat, gz.cam_pos.x, gz.cam_pos.y, gz.cam_pos.z,
+            at.x, at.y, at.z, up.x, up.y, up.z);
+  *mf_11DA0 = mf_lookat;
+}
+
+HOOK void cull_hook(MtxF *mf, z64_xyzf_t* actor_pos, z64_xyzf_t* projectedXYZ, float* projectedW){
+  // Ensure culling is still based off the usual ingame camera
+	MtxF mf_persp;
+	MtxF mf_lookat;
+
+	guPerspectiveF(&mf_persp, NULL, z64_game.view.fovy * M_PI / 180.f, 4.0f/3.0f, z64_game.view.zNear, z64_game.view.zFar, z64_game.view.scale);
+  guPerspectiveF(&mf_persp, NULL, M_PI / 3.f, 4.0f/3.0f, 1.f, 401.f, 1.f);
+  guLookAtF(&mf_lookat,
+          z64_game.view.eye.x, z64_game.view.eye.y, z64_game.view.eye.z,
+          z64_game.view.at.x, z64_game.view.at.y, z64_game.view.at.z,
+          z64_game.view.up.x, z64_game.view.up.y, z64_game.view.up.z);
+  
+  z64_xyzf_t new_vector;
+  float w;
+  vec3f_MtxF_mul(&new_vector, &w, actor_pos, &mf_lookat);
+  vec3f_MtxF_mul(projectedXYZ, projectedW, &new_vector, &mf_persp);
+}
+
+HOOK void skybox_update_hook(void *skyboxCtx, float x, float y, float z){
+  if (gz.cam_mode != CAMMODE_VIEW || !gz.cam_draw_textures){  
+    z64_UpdateSkybox(skyboxCtx,x,y,z);
+  }
+}
+
 static void main_return_proc(struct menu_item *item, void *data)
 {
   gz_hide_menu();
@@ -1050,6 +1105,7 @@ static void init(void)
   gz.free_cam = 0;
   gz.lock_cam = 0;
   gz.cam_mode = CAMMODE_CAMERA;
+  gz.cam_draw_textures = 0;
   gz.cam_bhv = CAMBHV_MANUAL;
   gz.cam_dist_min = 100;
   gz.cam_dist_max = 400;
@@ -1066,6 +1122,7 @@ static void init(void)
     gz.state_buf[i] = NULL;
   gz.state_slot = 0;
   gz.reset_flag = 0;
+  gz.early_view_flag = 0;
 
   /* load settings */
   if (input_z_pad() == BUTTON_START || !settings_load(gz.profile))

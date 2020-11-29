@@ -2298,6 +2298,8 @@ void      z64_osCreateMesgQueue       (OSMesgQueue *mq, OSMesg *msg,
                                        int32_t count);
 void      z64_osStartThread           (OSThread *t);
 void      z64_DrawActors              (z64_game_t *game, void *actor_ctxt);
+void      z64_DrawSkybox              (void* skyboxCtx, void* gfxCtx, int16_t skyboxId, int16_t alpha, float x, float y, float z);
+void      z64_UpdateSkybox            (void* skyboxCtx, float x, float y, float z);
 void      z64_DeleteActor             (z64_game_t *game, void *actor_ctxt,
                                        z64_actor_t *actor);
 void      z64_SpawnActor              (void *actor_ctxt, z64_game_t *game,

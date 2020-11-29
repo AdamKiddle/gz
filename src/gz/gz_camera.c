@@ -211,7 +211,9 @@ void gz_free_view(void)
   if (!gz.free_cam || gz.cam_mode != CAMMODE_VIEW)
     return;
 
-  gz_update_cam();
+  if (!gz.early_view_flag)
+    gz_update_cam();
+  gz.early_view_flag = 0;
 
   Mtx *m_persp = NULL;
   Mtx *m_lookat = NULL;
