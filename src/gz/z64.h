@@ -16,6 +16,7 @@
 #define Z64_OOTGCJ            0x05
 #define Z64_OOTGCU            0x06
 #define Z64_OOTCEJ            0x07
+#define Z64_OOT09             0x08
 
 #define Z64_SCREEN_WIDTH      320
 #define Z64_SCREEN_HEIGHT     240
@@ -60,7 +61,8 @@ struct z64_arena
   void             *start;                    /* 0x0004 */
 #if Z64_VERSION == Z64_OOT10 || \
     Z64_VERSION == Z64_OOT11 || \
-    Z64_VERSION == Z64_OOT12
+    Z64_VERSION == Z64_OOT12 || \
+    Z64_VERSION == Z64_OOT09
   uint32_t          size;                     /* 0x0008 */
   char              unk_0xC[0x0004];          /* 0x000C */
                                               /* 0x0010 */
@@ -82,7 +84,8 @@ struct z64_arena_node
   z64_arena_node_t *prev;                     /* 0x000C */
 #if Z64_VERSION == Z64_OOT10 || \
     Z64_VERSION == Z64_OOT11 || \
-    Z64_VERSION == Z64_OOT12
+    Z64_VERSION == Z64_OOT12 || \
+    Z64_VERSION == Z64_OOT09
   char             *filename;                 /* 0x0010 */
   int32_t           line;                     /* 0x0014 */
   OSId              thread_id;                /* 0x0018 */
@@ -785,7 +788,8 @@ typedef struct
   uint16_t          disable_music_flag;       /* 0x140E */
 #if Z64_VERSION == Z64_OOT10 || \
     Z64_VERSION == Z64_OOT11 || \
-    Z64_VERSION == Z64_OOT12
+    Z64_VERSION == Z64_OOT12 || \
+    Z64_VERSION == Z64_OOT09
   char              unk_0x1410[0x0020];       /* 0x1410 */
   z64_gameinfo_t   *gameinfo;                 /* 0x1430 */
   char              unk_0x1434[0x001C];       /* 0x1434 */
@@ -2047,7 +2051,8 @@ typedef struct
 /* file indices */
 #if Z64_VERSION == Z64_OOT10 || \
     Z64_VERSION == Z64_OOT11 || \
-    Z64_VERSION == Z64_OOT12
+    Z64_VERSION == Z64_OOT12 || \
+    Z64_VERSION == Z64_OOT09
 # define z64_icon_item_static                   8
 # define z64_icon_item_24_static                9
 # define z64_icon_item_field_static             10

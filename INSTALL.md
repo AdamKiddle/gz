@@ -32,6 +32,7 @@ Collector's Edition)
 -   Zeruda no Densetsu: Toki no Okarina - GC Ura (JPN) (GC)
 -   Zeruda no Densetsu: Toki no Okarina (JPN) (GC) (GC Ura Disc)
 -   Zeruda no Densetsu: Toki no Okarina (JPN) (GC) (Zeruda Korekushon)
+-   The Legend of Zelda: Ocarina of Time (USA) (0.9) (Beta)
 
 Ocarina of Time WADs:
 
